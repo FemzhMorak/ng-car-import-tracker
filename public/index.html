@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICEstimator</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <header class="page-header">
+    <div class="wrap">
+      <div class="brand">
+        <span class="brand-badge">
+          <svg viewBox="0 0 48 48" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="6" y="26" width="36" height="10" rx="5" />
+            <rect x="14" y="15" width="20" height="12" rx="5" />
+            <line x1="14" y1="26" x2="18" y2="16" />
+            <line x1="34" y1="26" x2="30" y2="16" />
+            <circle cx="14" cy="37" r="5" />
+            <circle cx="34" cy="37" r="5" />
+          </svg>
+        </span>
+        <div>
+          <h1>ICEstimator</h1>
+          <p class="subtitle">Estimate the full landed cost of a used car from Japan into Nigeria.</p>
+        </div>
+      </div>
+
+      <ol class="steps" id="steps">
+        <li class="step is-active" data-step="1"><span class="step-dot">1</span><span class="step-label">Search</span></li>
+        <li class="step" data-step="2"><span class="step-dot">2</span><span class="step-label">Details</span></li>
+        <li class="step" data-step="3"><span class="step-dot">3</span><span class="step-label">Result</span></li>
+      </ol>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card reveal is-visible" id="search-card">
+      <h2>Find your car</h2>
+      <form id="search-form" class="search-form">
+        <div class="field">
+          <label for="make">Make</label>
+          <select id="make" required>
+            <option value="" disabled selected>Loading makes…</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="model">Model</label>
+          <select id="model" required disabled>
+            <option value="" disabled selected>Select a make first</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="year">Year</label>
+          <select id="year" required></select>
+        </div>
+        <button type="submit" id="search-btn"><span>Get FOB Price</span></button>
+      </form>
+      <p class="hint" id="search-hint"></p>
+    </section>
+
+    <section class="card reveal" id="fob-card" hidden>
+      <button type="button" class="back-link" id="fob-back-btn">← Back to search</button>
+      <h2>FOB &amp; shipping details</h2>
+
+      <div class="car-photo" id="car-photo" hidden>
+        <div class="car-photo-frame">
+          <img id="car-photo-img" alt="" />
+          <div class="car-photo-skeleton" id="car-photo-skeleton"></div>
+        </div>
+        <p class="car-photo-caption" id="car-photo-caption"></p>
+      </div>
+
+      <div class="fob-summary" id="fob-summary"></div>
+      <div class="grid">
+        <div class="field">
+          <label for="fob">FOB price (USD)</label>
+          <input type="number" id="fob" min="0" step="1" />
+        </div>
+        <div class="field">
+          <label for="engineCC">Engine size (cc)</label>
+          <input type="number" id="engineCC" min="0" step="1" />
+        </div>
+        <div class="field">
+          <label for="freight">Freight (USD)</label>
+          <input type="number" id="freight" min="0" step="1" />
+        </div>
+        <div class="field">
+          <label for="insurance">Insurance (USD)</label>
+          <input type="number" id="insurance" min="0" step="1" />
+        </div>
+      </div>
+      <p class="hint">Freight defaults to a typical RORO estimate from Japan to Lagos; insurance defaults to 1% of FOB. Adjust either if you have better figures.</p>
+      <button type="button" id="calc-btn"><span>Calculate Landed Cost</span></button>
+    </section>
+
+    <section class="card reveal" id="result-card" hidden>
+      <button type="button" class="back-link" id="result-back-btn">← Edit details</button>
+      <h2>Import cost breakdown</h2>
+
+      <div class="currency-row">
+        <label for="currency-select">Show total in</label>
+        <select id="currency-select">
+          <option value="NGN">🇳🇬 NGN — Nigerian Naira</option>
+          <option value="USD">🇺🇸 USD — US Dollar</option>
+          <option value="GBP">🇬🇧 GBP — British Pound</option>
+          <option value="EUR">🇪🇺 EUR — Euro</option>
+          <option value="CAD">🇨🇦 CAD — Canadian Dollar</option>
+          <option value="ZAR">🇿🇦 ZAR — South African Rand</option>
+          <option value="GHS">🇬🇭 GHS — Ghanaian Cedi</option>
+        </select>
+      </div>
+
+      <div class="hero">
+        <div class="donut" id="donut">
+          <div class="donut-hole">
+            <span class="donut-eyebrow">Total landed cost</span>
+            <strong class="donut-ngn" id="hero-total">₦0</strong>
+            <span class="donut-usd" id="hero-usd">$0</span>
+          </div>
+        </div>
+
+        <ul class="legend" id="legend">
+          <li class="legend-item" data-key="fob"><i class="dot dot-fob"></i><span class="legend-label">FOB</span><span class="legend-value" id="legend-fob">$0</span></li>
+          <li class="legend-item" data-key="shipping"><i class="dot dot-shipping"></i><span class="legend-label">Freight &amp; Insurance</span><span class="legend-value" id="legend-shipping">$0</span></li>
+          <li class="legend-item" data-key="duties"><i class="dot dot-duties"></i><span class="legend-label">Duties &amp; Levies</span><span class="legend-value" id="legend-duties">$0</span></li>
+          <li class="legend-item" data-key="vat"><i class="dot dot-vat"></i><span class="legend-label">VAT</span><span class="legend-value" id="legend-vat">$0</span></li>
+        </ul>
+      </div>
+
+      <details class="details-panel">
+        <summary>View full breakdown</summary>
+        <table class="breakdown" id="breakdown-table">
+          <tbody></tbody>
+        </table>
+      </details>
+
+      <p class="rate-note" id="rate-note"></p>
+    </section>
+
+    <p class="disclaimer">
+      Figures are estimates for planning purposes only. FOB prices are modeled on typical Japanese export
+      auction pricing trends, not live listings. Duty rates are simplified and may not reflect the
+      latest Nigeria Customs Service tariffs — always confirm with a licensed clearing agent before making
+      financial decisions. Car photos are pulled from Wikipedia and illustrate the model generally; they may
+      not show the exact year or trim.
+    </p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
